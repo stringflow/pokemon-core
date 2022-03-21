@@ -1,0 +1,5 @@
+build/*
+test/roms/*
+
+debug-session.rdbg
+project.4coder
