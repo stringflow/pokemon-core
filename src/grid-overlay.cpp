@@ -170,7 +170,7 @@ void draw_path_with_prerun(GameBoy *gb, Grid *grid, StringIterator *it) {
     int *original_video = gb->video_buffer;
     gb->video_buffer = gb->video_buffer_copy;
     
-    SpeedupFlags old_speedup_flags = gb->speedup_flags;
+    int old_speedup_flags = gb->speedup_flags;
     int old_buffer_samples = gb->buffer_samples;
     gameboy_savestate(gb, gb->state_buffer);
     gameboy_setspeedupflags(gb, gb->gamedata.max_speedup_flags);

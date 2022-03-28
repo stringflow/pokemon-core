@@ -61,7 +61,7 @@ void parse_state_offsets(GameBoy *gb) {
     }
 }
 
-LoadResult hotload_sav(u8 *sram, const char *filename) {
+int hotload_sav(u8 *sram, const char *filename) {
     EntireFile sav = read_entire_file(filename);
     if(!sav.data) {
         return IO_ERROR;
@@ -85,12 +85,12 @@ DLLEXPORT GameBoy * gameboy_create() {
 // in case emulation is needed to start from a fresh save.
 // This function will return 0 on success and a negative value on failure. The error codes
 // are defined [here](https://github.com/pokemon-speedrunning/gambatte-core/blob/master/libgambatte/include/loadres.h).
-DLLEXPORT LoadResult gameboy_load(GameBoy *gb, const char *bios, const char *rom, const char *sav) {
+DLLEXPORT int gameboy_load(GameBoy *gb, const char *bios, const char *rom, const char *sav) {
     gb->gambatte_handle = gambatte_create();
     
     // TODO(stringflow): make this a parameter
     LoadFlags flags = (LoadFlags) (READONLY_SAV | GBA_FLAG | CGB_MODE);
-    LoadResult result = OK;
+    int result = OK;
     // TODO(stringflow): bios size and crc?
     if((result = gambatte_loadbios(gb->gambatte_handle, bios, 0, 0)) != OK) return result;
     if((result = gambatte_load(gb->gambatte_handle, rom, flags)) != OK) return result;

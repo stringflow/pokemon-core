@@ -9,7 +9,7 @@ struct GameData {
     int map_address;
     int rom_bank_address;
     u8 grid_lines_shade;
-    SpeedupFlags max_speedup_flags;
+    int max_speedup_flags;
 };
 
 const GameData RED_DATA = { 
@@ -20,7 +20,7 @@ const GameData RED_DATA = {
     .map_address = symbol_lookup_red("wCurMap"),
     .rom_bank_address = symbol_lookup_red("hLoadedROMBank"),
     .grid_lines_shade = 0x00,
-    .max_speedup_flags = (SpeedupFlags) (NO_VIDEO | NO_SOUND | NO_PPU_CALL),
+    .max_speedup_flags = NO_VIDEO | NO_SOUND | NO_PPU_CALL,
 };
 
 const GameData BLUE_DATA = { 
@@ -31,7 +31,7 @@ const GameData BLUE_DATA = {
     .map_address = symbol_lookup_blue("wCurMap"),
     .rom_bank_address = symbol_lookup_blue("hLoadedROMBank"),
     .grid_lines_shade = 0x00,
-    .max_speedup_flags = (SpeedupFlags) (NO_VIDEO | NO_SOUND | NO_PPU_CALL),
+    .max_speedup_flags = NO_VIDEO | NO_SOUND | NO_PPU_CALL,
 };
 
 const GameData YELLOW_DATA = { 
@@ -42,7 +42,7 @@ const GameData YELLOW_DATA = {
     .map_address = symbol_lookup_yellow("wCurMap"),
     .rom_bank_address = symbol_lookup_yellow("hLoadedROMBank"),
     .grid_lines_shade = 0x18,
-    .max_speedup_flags = (SpeedupFlags) (NO_VIDEO | NO_SOUND),
+    .max_speedup_flags = NO_VIDEO | NO_SOUND,
 };
 
 const GameData GOLD_DATA = { 
@@ -53,7 +53,7 @@ const GameData GOLD_DATA = {
     .map_address = symbol_lookup_gold("wMapNumber"),
     .rom_bank_address = symbol_lookup_gold("hROMBank"),
     .grid_lines_shade = 0x3a,
-    .max_speedup_flags = (SpeedupFlags) (NO_VIDEO | NO_SOUND),
+    .max_speedup_flags = NO_VIDEO | NO_SOUND,
 };
 
 const GameData SILVER_DATA = { 
@@ -64,7 +64,7 @@ const GameData SILVER_DATA = {
     .map_address = symbol_lookup_silver("wMapNumber"),
     .rom_bank_address = symbol_lookup_silver("hROMBank"),
     .grid_lines_shade = 0x3a,
-    .max_speedup_flags = (SpeedupFlags) (NO_VIDEO | NO_SOUND),
+    .max_speedup_flags = NO_VIDEO | NO_SOUND,
 };
 
 const GameData CRYSTAL_DATA = { 
@@ -75,7 +75,7 @@ const GameData CRYSTAL_DATA = {
     .map_address = symbol_lookup_crystal("wMapNumber"),
     .rom_bank_address = symbol_lookup_crystal("hROMBank"),
     .grid_lines_shade = 0x3a,
-    .max_speedup_flags = (SpeedupFlags) (NO_VIDEO | NO_SOUND),
+    .max_speedup_flags = NO_VIDEO | NO_SOUND,
 };
 
 #endif //GAMEDATA_H

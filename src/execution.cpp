@@ -56,7 +56,7 @@ DLLEXPORT int gameboy_getbankedprogramcounter(GameBoy *gb) {
 
 // Sets flags to control non-critical processes for CPU-concerned emulation.
 // The flags are defined [here](https://github.com/pokemon-speedrunning/gambatte-core/blob/master/libgambatte/include/gambatte.h#L439-L443).
-DLLEXPORT void gameboy_setspeedupflags(GameBoy *gb, SpeedupFlags flags) {
+DLLEXPORT void gameboy_setspeedupflags(GameBoy *gb, int flags) {
     gb->speedup_flags = flags;
     gambatte_setspeedupflags(gb->gambatte_handle, flags);
 }
@@ -73,7 +73,7 @@ DLLEXPORT int gameboy_maxspeedupflags(GameBoy *gb) {
 void update_breakpoint_buffer(GameBoy *gb) {
     gb->total_breakpoints = 0;
     if(!gb->callbacks_disabled) {
-        for(std::pair<int, BreakpointCallback> element : gb->global_breakpoints) {
+        for(std::pair<int, BreakpointCallback> element : gb->permanent_breakpoints) {
             gb->breakpoint_buffer[gb->total_breakpoints++] = element.first;
         }
     }
@@ -86,20 +86,20 @@ void update_breakpoint_buffer(GameBoy *gb) {
     gambatte_setinterruptaddresses(gb->gambatte_handle, gb->breakpoint_buffer, gb->total_breakpoints);
 }
 
-// Sets a global breakpoint at the specified address. Once that address has been hit, the
+// Sets a permanent breakpoint at the specified address. Once that address has been hit, the
 // provided callback will be called. After that, the breakpoint will still be active and
 // will be called again if the address is hit another time.
 // For one time breakpoints, make sure to call gameboy_removebreakpoint to
 // disable it. Please note that due to a current limitation, there can only be one
 // global breakpoint at a given address.
 DLLEXPORT void gameboy_setbreakpoint(GameBoy *gb, int address, BreakpointCallback callback) {
-    gb->global_breakpoints[address] = callback;
+    gb->permanent_breakpoints[address] = callback;
     update_breakpoint_buffer(gb);
 }
 
-// Removes the global breakpoint at the specified address.
+// Removes the permanent breakpoint at the specified address.
 DLLEXPORT void gameboy_removebreakpoint(GameBoy *gb, int address) {
-    gb->global_breakpoints.erase(address);
+    gb->permanent_breakpoints.erase(address);
     update_breakpoint_buffer(gb);
 }
 
@@ -146,8 +146,8 @@ int gameboy_runfor(GameBoy *gb, u64 samples) {
     int hit_address = gambatte_gethitinterruptaddress(gb->gambatte_handle);
     // NOTE(stringflow): don't bother searching for callbacks if CPU wasn't interrupted.
     if(hit_address != -1 && !gb->callbacks_disabled) {
-        std::map<int, BreakpointCallback>::iterator it = gb->global_breakpoints.find(hit_address);
-        if(it != gb->global_breakpoints.end()) {
+        std::map<int, BreakpointCallback>::iterator it = gb->permanent_breakpoints.find(hit_address);
+        if(it != gb->permanent_breakpoints.end()) {
             it->second(gb);
             // NOTE(stringflow): Advance by one sample without any interrupts to ensure
             // infinite loops do not happen (runfor stopping at breakpoint for callback,

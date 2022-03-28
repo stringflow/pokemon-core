@@ -42,7 +42,7 @@ Overwrites the total seconds that have been elapsed since RTC started.
 `(GameBoy *gb) -> int`  
 Returns the program counter along with an optional ROM bank. The format is 0xBBAAAA where AAAA is an address and BB is an optional ROM bank.
 ### gameboy_setspeedupflags
-`(GameBoy *gb, SpeedupFlags flags) -> void`  
+`(GameBoy *gb, int flags) -> void`  
 Sets flags to control non-critical processes for CPU-concerned emulation.  
 The flags are defined [here](https://github.com/pokemon-speedrunning/gambatte-core/blob/master/libgambatte/include/gambatte.h#L439-L443).
 ### gameboy_maxspeedupflags
@@ -50,11 +50,11 @@ The flags are defined [here](https://github.com/pokemon-speedrunning/gambatte-co
 Returns the flags that result in maximum performance for the loaded game without breaking overall emulation.
 ### gameboy_setbreakpoint
 `(GameBoy *gb, int address, BreakpointCallback callback) -> void`  
-Sets a global breakpoint at the specified address. Once that address has been hit, the provided callback will be called. After that, the breakpoint will still be active and will be called again if the address is hit another time.  
+Sets a permanent breakpoint at the specified address. Once that address has been hit, the provided callback will be called. After that, the breakpoint will still be active and will be called again if the address is hit another time.  
 For one time breakpoints, make sure to call [gameboy_removebreakpoint](#gameboy_removebreakpoint) to disable it. Please note that due to a current limitation, there can only be one global breakpoint at a given address.
 ### gameboy_removebreakpoint
 `(GameBoy *gb, int address) -> void`  
-Removes the global breakpoint at the specified address.
+Removes the permanent breakpoint at the specified address.
 ### gameboy_setbreakpointsym
 `(GameBoy *gb, const char *label, BreakpointCallback callback) -> void`  
 Sets a global breakpoint at the specified sym label.  
