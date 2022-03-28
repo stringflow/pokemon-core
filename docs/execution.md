@@ -42,7 +42,7 @@ Overwrites the total seconds that have been elapsed since RTC started.
 `(GameBoy *gb) -> int`  
 Returns the program counter along with an optional ROM bank. The format is 0xBBAAAA where AAAA is an address and BB is an optional ROM bank.
 ### gameboy_setspeedupflags
-`(GameBoy *gb, int flags) -> void`  
+`(GameBoy *gb, SpeedupFlags flags) -> void`  
 Sets flags to control non-critical processes for CPU-concerned emulation.  
 The flags are defined [here](https://github.com/pokemon-speedrunning/gambatte-core/blob/master/libgambatte/include/gambatte.h#L439-L443).
 ### gameboy_maxspeedupflags
@@ -93,12 +93,11 @@ Injects the specified buttons by writing to the game's designated joypad address
 `(GameBoy *gb, u8 buttons) -> void`  
 Runs until the game next polls for joypad input, then injects the input.
 ### gameboy_execute
-`(GameBoy *gb, const char *logstring) -> int`  
+`(GameBoy *gb, const char *logstring) -> ExecutionResult`  
 Executes any manip log string (i.e. `nopal`, `hop2`, `title1(reset)`, `R`, `D+A`, etc.)  
-For overworld actions it returns the address at which emulation stopped.  
-For gen 1 these include: `CalcStats`, `CollisionCheckOnLand.collision`, `CollisionCheckOnWater.collision`, and `JoypadOverworld`.  
-For gen 2 these include: `RandomEncounter.ok`, `DoPlayerMovement.BumpSound`, `PrintLetterDelay.checkjoypad` and `OWPlayerInput`.  
-For intro actions, 0 is returned instead.
+For overworld actions it returns an enum for when emulation stopped.  
+Possible values are: INTRO (0), OVERWORLD_LOOP (1), WILD_ENCOUNTER (2), COLLISION (3),  
+TEXTBOX (4). Please note that for gen 2 execution, DVs of the wild encounter will not be generated yet, so further emulation until `CalcMonStats` has to be done for those.
 ### gameboy_cleartext
 `(GameBoy *gb, int held_button) -> void`  
 Clears all text until control is resumed to the player. This may happen at YES/NO dialogues, when overworld movement is resumed, etc. It will hold the specified button while text is printing for adequate manip execution, or no button at all for instant text execution.
@@ -109,7 +108,7 @@ Picks up the item in front of the player.
 `(GameBoy *gb, const char *intro) -> void`  
 Executes a full intro string, where each action is seperated by an underscore.
 ### gameboy_executepath
-`(GameBoy *gb, const char *path) -> int`  
+`(GameBoy *gb, const char *path) -> ExecutionResult`  
 Executes a full movement string, where actions are optionally seperated by spaces.  
 May not complete the entire path if a disturbance occurrs (wild encounter, collision, etc). Returns the address of the final [gameboy_execute](#gameboy_execute) call.
 ### gameboy_yoloball
