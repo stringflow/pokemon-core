@@ -1,4 +1,4 @@
-#include "..\src\gameboy.h"
+#define ARRAY_SIZE(array) ((sizeof(array) / sizeof(array[0])))
 #include <stdio.h>
 #include <string.h>
 
@@ -22,17 +22,15 @@ constexpr unsigned long long hash(const char *src, int off = 0) {
         
         FILE *in = fopen(file_path, "r");
         char line[256];
+        char label[256];
         int bank;
         int addr;
-        char *label;
         while(fgets(line, ARRAY_SIZE(line), in)) {
             if(*line == ';') continue;
             
             line[strlen(line) - 1] = 0;
             
-            bank = ascii_to_int(line, 16);
-            addr = ascii_to_int(line+3, 16);
-            label = line + 8;
+            sscanf(line, "%02x:%04x %s", &bank, &addr, label);
             fprintf(out, "    case hash(\"%s\"): return 0x%08x;\n", 
                     label, bank << 16 | addr);
         }
