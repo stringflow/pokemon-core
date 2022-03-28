@@ -56,7 +56,7 @@ DLLEXPORT int gameboy_getbankedprogramcounter(GameBoy *gb) {
 
 // Sets flags to control non-critical processes for CPU-concerned emulation.
 // The flags are defined [here](https://github.com/pokemon-speedrunning/gambatte-core/blob/master/libgambatte/include/gambatte.h#L439-L443).
-DLLEXPORT void gameboy_setspeedupflags(GameBoy *gb, int flags) {
+DLLEXPORT void gameboy_setspeedupflags(GameBoy *gb, SpeedupFlags flags) {
     gb->speedup_flags = flags;
     gambatte_setspeedupflags(gb->gambatte_handle, flags);
 }
@@ -268,13 +268,11 @@ DLLEXPORT void gameboy_press(GameBoy *gb, u8 buttons) {
 }
 
 // Executes any manip log string (i.e. `nopal`, `hop2`, `title1(reset)`, `R`, `D+A`, etc.)
-// For overworld actions it returns the address at which emulation stopped.
-// For gen 1 these include: `CalcStats`, `CollisionCheckOnLand.collision`,
-// `CollisionCheckOnWater.collision`, and `JoypadOverworld`.
-// For gen 2 these include: `RandomEncounter.ok`, `DoPlayerMovement.BumpSound`,
-// `PrintLetterDelay.checkjoypad` and `OWPlayerInput`.
-// For intro actions, 0 is returned instead.
-DLLEXPORT int gameboy_execute(GameBoy *gb, const char *logstring) {
+// For overworld actions it returns an enum for when emulation stopped.
+// Possible values are: INTRO (0), OVERWORLD_LOOP (1), WILD_ENCOUNTER (2), COLLISION (3),
+// TEXTBOX (4). Please note that for gen 2 execution, DVs of the wild encounter will not
+// be generated yet, so further emulation until `CalcMonStats` has to be done for those.
+DLLEXPORT ExecutionResult gameboy_execute(GameBoy *gb, const char *logstring) {
     if(gb->game & RBY) {
         return rby_execute(gb, logstring);
     } else {
@@ -315,7 +313,7 @@ DLLEXPORT void gameboy_executeintro(GameBoy *gb, const char *intro) {
 // Executes a full movement string, where actions are optionally seperated by spaces.
 // May not complete the entire path if a disturbance occurrs (wild encounter, collision,
 // etc). Returns the address of the final gameboy_execute call.
-DLLEXPORT int gameboy_executepath(GameBoy *gb, const char *path) {
+DLLEXPORT ExecutionResult gameboy_executepath(GameBoy *gb, const char *path) {
     if(gb->show_grid) {
         if(gb->grid.pixels) {
             grid_free(&gb->grid);
@@ -323,12 +321,12 @@ DLLEXPORT int gameboy_executepath(GameBoy *gb, const char *path) {
         gb->grid = grid_create(gb, path);
     }
     
-    int ret = gb->gamedata.overworld_address;
     StringIterator it = { path };
-    while(iterate_over_path(&it) && ret == gb->gamedata.overworld_address) {
-        ret = gameboy_execute(gb, it.current_element);
+    ExecutionResult result = OVERWORLD_LOOP;
+    while(iterate_over_path(&it) && result == OVERWORLD_LOOP) {
+        result = gameboy_execute(gb, it.current_element);
     }
-    return ret;
+    return result;
 }
 
 // Throws the ball located at the top of the item bag. Returns whether or not the pokemon

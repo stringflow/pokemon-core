@@ -116,10 +116,10 @@ typedef void (*VideoCallback)(GameBoy *, int *);
 DLLIMPORT int gambatte_revision();
 DLLIMPORT void * gambatte_create();
 DLLIMPORT void gambatte_destroy(void *gb);
-DLLIMPORT int gambatte_load(void *gb, const char *romfile, int flags);
-DLLIMPORT int gambatte_loadbios(void *gb, const char *biosfile, int size, int crc);
+DLLIMPORT LoadResult gambatte_load(void *gb, const char *romfile, LoadFlags flags);
+DLLIMPORT LoadResult gambatte_loadbios(void *gb, const char *biosfile, int size, int crc);
 DLLIMPORT void gambatte_setinputgetter(void *gb, InputGetter get_input, void *p);
-DLLIMPORT void gambatte_setspeedupflags(void *gb, int speedup_flags);
+DLLIMPORT void gambatte_setspeedupflags(void *gb, SpeedupFlags speedup_flags);
 DLLIMPORT int gambatte_timenow(void *gb);
 DLLIMPORT void gambatte_setinterruptaddresses(void *gb, int *addrs, int addrs_count);
 DLLIMPORT int gambatte_gethitinterruptaddress(void *gb);
@@ -144,7 +144,7 @@ struct GameBoy {
     u64 buffer_samples;
     u64 samples_emulated;
     int current_buttons;
-    int speedup_flags;
+    SpeedupFlags speedup_flags;
     bool callbacks_disabled;
     
     int breakpoint_buffer[MAX_BREAKPOINTS];

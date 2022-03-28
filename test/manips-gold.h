@@ -8,7 +8,7 @@ bool gold_totodile(GameBoy *gb, int path) {
     gameboy_executeintro(gb, gsc_intro(11 + path));
     gameboy_cpuwrite(gb, "wGameTimeFrames", 23);
     ASSERT_EQUALS(gameboy_executepath(gb, "RS_BDA+RRDU"),
-                  symbol_lookup(gb, "OWPlayerInput"));
+                  OVERWORLD_LOOP);
     ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6149);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 7);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 4);
@@ -36,7 +36,7 @@ bool gold_r29(GameBoy *gb, int path) {
     gameboy_setrtc(gb, 10*60);
     gameboy_executeintro(gb, gsc_intro(14 + (path % 3)));
     ASSERT_EQUALS(gameboy_executepath(gb, paths[path]),
-                  symbol_lookup(gb, "OWPlayerInput"));
+                  OVERWORLD_LOOP);
     
     if(path < 3) {
         ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6657);
@@ -62,7 +62,7 @@ bool gold_don(GameBoy *gb, int path) {
     gameboy_setrtc(gb, 15*60);
     gameboy_executeintro(gb, gsc_intro(12 + path));
     ASSERT_EQUALS(gameboy_executepath(gb, paths[path]),
-                  symbol_lookup(gb, "OWPlayerInput"));
+                  OVERWORLD_LOOP);
     
     ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6658);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 9);

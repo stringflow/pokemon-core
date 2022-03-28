@@ -170,7 +170,7 @@ void draw_path_with_prerun(GameBoy *gb, Grid *grid, StringIterator *it) {
     int *original_video = gb->video_buffer;
     gb->video_buffer = gb->video_buffer_copy;
     
-    int old_speedup_flags = gb->speedup_flags;
+    SpeedupFlags old_speedup_flags = gb->speedup_flags;
     int old_buffer_samples = gb->buffer_samples;
     gameboy_savestate(gb, gb->state_buffer);
     gameboy_setspeedupflags(gb, gb->gamedata.max_speedup_flags);
@@ -181,9 +181,9 @@ void draw_path_with_prerun(GameBoy *gb, Grid *grid, StringIterator *it) {
     u8 previous_y = gameboy_cpuread(gb, gb->gamedata.ycoord_address);
     u8 previous_map = gameboy_cpuread(gb, gb->gamedata.map_address);
     
-    int ret = gb->gamedata.overworld_address;
-    while(iterate_over_path(it) && ret == gb->gamedata.overworld_address) {
-        ret = gameboy_execute(gb, it->current_element);
+    ExecutionResult result = OVERWORLD_LOOP;
+    while(iterate_over_path(it) && result == OVERWORLD_LOOP) {
+        result = gameboy_execute(gb, it->current_element);
         
         u8 new_x = gameboy_cpuread(gb, gb->gamedata.xcoord_address);
         u8 new_y = gameboy_cpuread(gb, gb->gamedata.ycoord_address);

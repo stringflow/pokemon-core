@@ -9,7 +9,7 @@ bool crystal_totodile(GameBoy *gb, int path) {
     gameboy_executeintro(gb, gsc_intro(61 + path));
     gameboy_cpuwrite(gb, "wGameTimeFrames", 4);
     ASSERT_EQUALS(gameboy_executepath(gb, paths[path]),
-                  symbol_lookup(gb, "OWPlayerInput"));
+                  OVERWORLD_LOOP);
     ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6149);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 7);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 4);
@@ -37,7 +37,7 @@ bool crystal_r29(GameBoy *gb, int path) {
     gameboy_setrtc(gb, 10*60);
     gameboy_executeintro(gb, gsc_intro(2 + (path % 3)));
     ASSERT_EQUALS(gameboy_executepath(gb, paths[path]),
-                  symbol_lookup(gb, "OWPlayerInput"));
+                  OVERWORLD_LOOP);
     
     if(path < 3) {
         ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6657);
@@ -56,7 +56,7 @@ bool crystal_r30_5(GameBoy *gb, int path) {
     gameboy_setrtc(gb, 15*60);
     gameboy_executeintro(gb, gsc_intro(path));
     ASSERT_EQUALS(gameboy_executepath(gb,"UUUUUUUULULUUUUUUURRRRRRUUUUUUUUURRRRRRUUUUUULLLLLLLLLLLDDLLLA+LLLLLUA+LLLUA+LU"),
-                  symbol_lookup(gb, "OWPlayerInput"));
+                  OVERWORLD_LOOP);
     ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6658);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 9);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 9);
@@ -67,13 +67,13 @@ bool crystal_r32(GameBoy *gb, int path) {
     gameboy_setrtc(gb, 20*60);
     gameboy_executeintro(gb, gsc_intro(path));
     ASSERT_EQUALS(gameboy_executepath(gb,"DDDDDDDDDDLLDDDLLLLLLDDDLLDLLLDLDDLD"),
-                  symbol_lookup(gb, "OWPlayerInput"));
+                  OVERWORLD_LOOP);
     ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 2561);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 3);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 29);
     gameboy_pickupitem(gb);
     ASSERT_EQUALS(gameboy_executepath(gb,"DDDDDLDDDDDDDDLDDDDDDDA+DDDDDDDDDDRDDRRA+RDDDDDD"),
-                  symbol_lookup(gb, "OWPlayerInput"));
+                  OVERWORLD_LOOP);
     ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 2561);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 5);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 67);
@@ -103,7 +103,7 @@ bool crystal_raikou(GameBoy *gb, int path) {
     gameboy_setrtc(gb, 40*60);
     gameboy_executeintro(gb, gsc_intro(11+path));
     ASSERT_EQUALS(gameboy_executepath(gb, paths[path]),
-                  symbol_lookup(gb, "RandomEncounter.ok"));
+                  WILD_ENCOUNTER);
     gameboy_rununtil(gb, "CalcMonStats", NONE);
     ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 2564);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), end_coordinates[path*2+0]);

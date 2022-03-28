@@ -53,10 +53,10 @@ void gsc_press(GameBoy *gb, int buttons) {
     gameboy_advanceframe(gb, buttons);
 }
 
-int gsc_execute(GameBoy *gb, const char *logstring) {
+ExecutionResult gsc_execute(GameBoy *gb, const char *logstring) {
     Action action = parse_action(logstring);
     
-    int ret = 0;
+    int addr = 0;
     int buttons = 0;
     switch(hash(action.string)) {
         case hash("R"): if(!buttons) buttons = RIGHT;
@@ -78,22 +78,28 @@ int gsc_execute(GameBoy *gb, const char *logstring) {
             
             gameboy_rununtil(gb, "OWPlayerInput", buttons);
             gameboy_injectinput(gb, buttons);
-            ret = gameboy_rununtil(gb, overworld_addrs, overworld_addrs_size-1, buttons);
-            if(ret == symbol_lookup(gb, "CountStep")) {
-                ret = gameboy_rununtil(gb, overworld_addrs+3, 2, buttons);
+            addr = gameboy_rununtil(gb, overworld_addrs, overworld_addrs_size-1, buttons);
+            if(addr == symbol_lookup(gb, "CountStep")) {
+                addr = gameboy_rununtil(gb, overworld_addrs+3, 2, buttons);
             }
             
             // TODO(stringflow): emulating until CalcMonStats is super slow for no encounter
             // manips, so not sure if i wanna do it in here.
+            if(addr == overworld_addrs[1]) return TEXTBOX;
+            else if(addr == overworld_addrs[2]) return COLLISION;
+            else if(addr == overworld_addrs[3]) return WILD_ENCOUNTER;
+            return OVERWORLD_LOOP;
         } break;
         case hash("S_B"): {
             gameboy_press(gb, START);
             gameboy_press(gb, B);
-            ret = gameboy_rununtil(gb, "OWPlayerInput", B);
+            addr = gameboy_rununtil(gb, "OWPlayerInput", B);
+            return OVERWORLD_LOOP;
         } break;
         case hash("SEL"): {
             gameboy_press(gb, SELECT);
-            ret = gameboy_rununtil(gb, "OWPlayerInput", SELECT);
+            addr = gameboy_rununtil(gb, "OWPlayerInput", SELECT);
+            return OVERWORLD_LOOP;
         } break;
         case hash("gfskip"): 
         case hash("title"):{
@@ -108,7 +114,7 @@ int gsc_execute(GameBoy *gb, const char *logstring) {
         } break;
     }
     
-    return ret;
+    return INTRO;
 }
 
 void gsc_cleartext(GameBoy *gb, int held_button) {

@@ -11,10 +11,10 @@ void rby_press(GameBoy *gb, int buttons) {
     gameboy_advanceframe(gb, NONE);
 }
 
-int rby_execute(GameBoy *gb, const char *logstring) {
+ExecutionResult rby_execute(GameBoy *gb, const char *logstring) {
     Action action = parse_action(logstring);
     
-    int ret = 0;
+    int addr = 0;
     int buttons = 0;
     switch(hash(action.string)) {
         case hash("R"): if(!buttons) buttons = RIGHT;
@@ -33,40 +33,45 @@ int rby_execute(GameBoy *gb, const char *logstring) {
             do {
                 gameboy_rununtil(gb, "JoypadOverworld", NONE);
                 gameboy_injectinput(gb, buttons);
-                ret = gameboy_rununtil(gb, overworld_addrs, overworld_addrs_size, buttons);
-                if(ret ==symbol_lookup(gb, "TryDoWildEncounter.CanEncounter")+6) {
-                    return gameboy_rununtil(gb, "CalcStats", NONE);
-                } else if(ret == symbol_lookup(gb, "CollisionCheckOnLand.collision") ||
-                          ret == symbol_lookup(gb, "CollisionCheckOnWater.collision")) {
-                    return ret;
+                addr = gameboy_rununtil(gb, overworld_addrs, overworld_addrs_size, buttons);
+                if(addr == symbol_lookup(gb, "TryDoWildEncounter.CanEncounter")+6) {
+                    gameboy_rununtil(gb, "CalcStats", NONE);
+                    return WILD_ENCOUNTER;
+                } else if(addr == symbol_lookup(gb, "CollisionCheckOnLand.collision") ||
+                          addr == symbol_lookup(gb, "CollisionCheckOnWater.collision")) {
+                    return COLLISION;
                 }
-                ret = gameboy_rununtil(gb, "JoypadOverworld", NONE);
+                addr = gameboy_rununtil(gb, "JoypadOverworld", NONE);
             } while(gameboy_cpuread(gb, "wd736") & 0x40 ||      // Jumping ledge
                     gameboy_cpuread(gb, "wd736") & 0x02 ||      // Door tile pathing
                     gameboy_cpuread(gb, "wd730") & 0x08 ||      // Simualted joypad
                     gameboy_cpuread(gb, "wJoyIgnore") >= 0xfc); // Disabled Joypad
+            return OVERWORLD_LOOP;
         } break;
         case hash("A"): {
-            const char * a_press_addrs[] {
-                "JoypadOverworld",
-                "PrintLetterDelay",
+            int a_press_addrs[] {
+                symbol_lookup(gb, "JoypadOverworld"),
+                symbol_lookup(gb, "PrintLetterDelay"),
             };
             constexpr int a_press_addrs_size = ARRAY_SIZE(a_press_addrs);
             gameboy_injectinput(gb, A);
             gameboy_runfor(gb, 1);
-            ret = gameboy_rununtil(gb, a_press_addrs, a_press_addrs_size, A);
+            addr = gameboy_rununtil(gb, a_press_addrs, a_press_addrs_size, A);
+            return addr == a_press_addrs[0] ? OVERWORLD_LOOP : TEXTBOX;
         } break;
         case hash("S_B"): {
             gameboy_press(gb, START);
             gameboy_press(gb, B);
-            ret = gameboy_rununtil(gb, "JoypadOverworld", NONE);
+            addr = gameboy_rununtil(gb, "JoypadOverworld", NONE);
+            return OVERWORLD_LOOP;
         } break;
         case hash("S_A_B_S"): {
             gameboy_press(gb, START);
             gameboy_press(gb, A);
             gameboy_press(gb, B);
             gameboy_press(gb, START);
-            ret = gameboy_rununtil(gb, "JoypadOverworld", NONE);
+            addr = gameboy_rununtil(gb, "JoypadOverworld", NONE);
+            return OVERWORLD_LOOP;
         } break;
         case hash("S_A_B_A_B_S"): {
             gameboy_press(gb, START);
@@ -75,7 +80,7 @@ int rby_execute(GameBoy *gb, const char *logstring) {
             gameboy_press(gb, A);
             gameboy_press(gb, B);
             gameboy_press(gb, START);
-            ret = gameboy_rununtil(gb, "JoypadOverworld", NONE);
+            addr = gameboy_rununtil(gb, "JoypadOverworld", NONE);
         } break;
         case hash("nopal"): {
             gameboy_rununtil(gb, 0x100, NONE);
@@ -217,7 +222,7 @@ int rby_execute(GameBoy *gb, const char *logstring) {
         } break;
     }
     
-    return ret;
+    return INTRO;
 }
 
 void rby_cleartext(GameBoy *gb, int held_button) {
