@@ -39,6 +39,7 @@ struct OAMSprite {
 Grid grid_create(GameBoy *gb, const char *path);
 void grid_free(Grid *grid);
 void grid_update_viewport(GameBoy *gb, Grid *grid);
+void grid_process_tiles(GameBoy *gb, Grid *grid);
 void grid_blittovideo(GameBoy *gb, int *dest, Grid *src);
 
 #endif //GRID_OVERLAY_H

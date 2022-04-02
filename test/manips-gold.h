@@ -9,7 +9,7 @@ bool gold_totodile(GameBoy *gb, int path) {
     gameboy_cpuwrite(gb, "wGameTimeFrames", 23);
     ASSERT_EQUALS(gameboy_executepath(gb, "RS_BDA+RRDU"),
                   OVERWORLD_LOOP);
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6149);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wMapGroup"), 6149);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 7);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 4);
     gameboy_press(gb, A);
@@ -19,7 +19,7 @@ bool gold_totodile(GameBoy *gb, int path) {
     gameboy_cleartext(gb, B);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wPartyMon1Species"), 158);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wPartyMon1Level"), 5);
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wPartyMon1DVs"), dvs[path]);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wPartyMon1DVs"), dvs[path]);
     return true;
 }
 
@@ -39,11 +39,11 @@ bool gold_r29(GameBoy *gb, int path) {
                   OVERWORLD_LOOP);
     
     if(path < 3) {
-        ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6657);
+        ASSERT_EQUALS(gameboy_cpuread16be(gb, "wMapGroup"), 6657);
         ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 17);
         ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 11);
     } else {
-        ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6657);
+        ASSERT_EQUALS(gameboy_cpuread16be(gb, "wMapGroup"), 6657);
         ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 5);
         ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 25);
     }
@@ -64,7 +64,7 @@ bool gold_don(GameBoy *gb, int path) {
     ASSERT_EQUALS(gameboy_executepath(gb, paths[path]),
                   OVERWORLD_LOOP);
     
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6658);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wMapGroup"), 6658);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 9);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 9);
     return true;

@@ -150,12 +150,8 @@ void grid_produce_image(GameBoy *gb, Grid *grid) {
         grid_fillrect(grid, x*16, y*16, 16, 16, color);
     }
     
-    // TODO(stringflow): Color for grid lines should be read from the game's palette, but
-    // documentation is awkward.
-    int lines_color = ((0xff << 24) |
-                       (gb->gamedata.grid_lines_shade << 16) | 
-                       (gb->gamedata.grid_lines_shade <<  8) | 
-                       (gb->gamedata.grid_lines_shade <<  0));
+    u8 line_shade = gb->gamedata.grid_line_shade;
+    int lines_color = argb_pack_4x8(0xff, line_shade, line_shade, line_shade);
     
     for(int x = 0; x < grid->width; x += 16) {
         grid_fillrect(grid, x, 0, 1, grid->height, lines_color);
@@ -248,6 +244,56 @@ void grid_free(Grid *grid) {
     grid->hidden_pixels = nullptr;
 }
 
+void grid_process_tile(Grid *dest, u8 *tile_data, int screen_x, int screen_y, bool mirror_x, bool mirror_y, int hide_threshold) {
+    for(int row = 0; row < 8; row++) {
+        u8 lsb = *tile_data++;
+        u8 msb = *tile_data++;
+        
+        for(int col = 0; col < 8; col++) {
+            u8 pixel = (msb & 1) << 1 | (lsb & 1);
+            lsb >>= 1;
+            msb >>= 1;
+            
+            if(pixel > hide_threshold) {
+                int pixel_x = screen_x + (mirror_x ? col : 7 - col);
+                int pixel_y = screen_y + (mirror_y ? 7 - row : row);
+                
+                if(pixel_x < 0 || pixel_x >= VIDEO_WIDTH ||
+                   pixel_y < 0 || pixel_y >= VIDEO_HEIGHT) continue;
+                
+                dest->hidden_pixels[pixel_x + pixel_y * VIDEO_WIDTH] = true;
+            }
+        }
+    }
+}
+
+void grid_process_sprites(Grid *grid, u8 *oam, u8 *vram) {
+    for(int sprite_index = 0; sprite_index < 40; sprite_index++) {
+        OAMSprite *sprite = (OAMSprite *) oam;
+        oam += sizeof(OAMSprite);
+        
+        int vram_bank = (sprite->flags >> 3) & 1;
+        u8 *sprite_tile = vram + sprite->tile * 16 + vram_bank * 0x2000;
+        grid_process_tile(grid, sprite_tile, 
+                          sprite->x - 8, sprite->y - 16,
+                          sprite->flags & 0x20, sprite->flags & 0x40, 0);
+    }
+}
+
+void grid_process_background_tiles(Grid *dest, u8 *vram, bool bank1, int offset_x, int offset_y) {
+    u8 *tile_map = vram + (bank1 ? 0x1c00 : 0x1800);
+    for(int tile_y = 0; tile_y < (VIDEO_HEIGHT - offset_y) / 8; tile_y++) {
+        for(int tile_x = 0; tile_x < (VIDEO_WIDTH - offset_x) / 8; tile_x++) {
+            u8 tile_index = tile_map[tile_x + tile_y * 32];
+            if(tile_index >= 0x60) {
+                grid_process_tile(dest, vram + tile_index * 16, 
+                                  tile_x * 8 + offset_x, tile_y * 8 + offset_y, 
+                                  false, false, -1); 
+            }
+        }
+    }
+}
+
 void grid_update_viewport(GameBoy *gb, Grid *grid) {
     BGMapScroll new_scroll = read_scroll(gb);
     
@@ -279,68 +325,13 @@ void grid_update_viewport(GameBoy *gb, Grid *grid) {
     grid->scroll = new_scroll;
 }
 
-void grid_hide_behind_sprites(Grid *grid, u8 *oam, u8 *vram) {
-    for(int sprite_index = 0; sprite_index < 40; sprite_index++) {
-        OAMSprite *sprite = (OAMSprite *) oam;
-        oam += sizeof(OAMSprite);
-        
-        bool mirror_y = sprite->flags & 0x40;
-        bool mirror_x = sprite->flags & 0x20;
-        int vram_bank = (sprite->flags >> 3) & 1;
-        
-        u8 *sprite_pixels = vram + sprite->tile * 16 + vram_bank * 0x2000;
-        
-        for(int y = 0; y < 8; y++) {
-            int sprite_pixel_y = y;
-            if(mirror_y) sprite_pixel_y = 7 - y;
-            
-            u8 top = *sprite_pixels++;
-            u8 bot = *sprite_pixels++;
-            
-            for(int x = 0; x < 8; x++) {
-                int sprite_pixel_x = x;
-                if(mirror_x) sprite_pixel_x = 7 - x;
-                
-                if(!((top >> (7 - x)) & 1) && 
-                   !((bot >> (7 - x)) & 1)) continue;
-                
-                int screen_pixel_x = sprite->x + sprite_pixel_x - 8;
-                int screen_pixel_y = sprite->y + sprite_pixel_y - 16;
-                
-                if(screen_pixel_x < 0 || screen_pixel_x >= VIDEO_WIDTH ||
-                   screen_pixel_y < 0 || screen_pixel_y >= VIDEO_HEIGHT) continue;
-                
-                grid->hidden_pixels[screen_pixel_x + screen_pixel_y * VIDEO_WIDTH] = true;
-            }
-        }
-    }
-    
-}
-
-void grid_hide_behind_menu_tiles(Grid *dest, u8 *vram, bool bank1, int offset_x, int offset_y) {
-    u8 *tile_map = vram + (bank1 ? 0x1c00 : 0x1800);
-    for(int tile_y = 0; tile_y < (VIDEO_HEIGHT - offset_y) / 8; tile_y++) {
-        for(int tile_x = 0; tile_x < (VIDEO_WIDTH - offset_x) / 8; tile_x++) {
-            if(tile_map[tile_x + tile_y * 32] >= 0x60) {
-                for(int pixel_y = 0; pixel_y < 8; pixel_y++) {
-                    for(int pixel_x = 0; pixel_x < 8; pixel_x++) {
-                        int screen_x = tile_x * 8 + pixel_x + offset_x;
-                        int screen_y = tile_y * 8 + pixel_y + offset_y;
-                        dest->hidden_pixels[screen_x + screen_y * VIDEO_WIDTH] = true;
-                    }
-                }
-            }
-        }
-    }
-}
-
-void grid_blittovideo(GameBoy *gb, int *dest, Grid *src) {
-    memset(src->hidden_pixels, false, VIDEO_SIZE);
+void grid_process_tiles(GameBoy *gb, Grid *grid) {
+    memset(grid->hidden_pixels, false, VIDEO_SIZE);
     
     gameboy_savestate(gb, gb->state_buffer);
     u8 *oam = gb->state_buffer + gb->state_offsets["hram"];
     u8 *vram = gb->state_buffer + gb->state_offsets["vram"];
-    grid_hide_behind_sprites(src, oam, vram);
+    grid_process_sprites(grid, oam, vram);
     
     u8 lcdc = gameboy_cpuread(gb, 0xff40);
     u8 window_x = gameboy_cpuread(gb, 0xff4b) - 7;
@@ -348,11 +339,14 @@ void grid_blittovideo(GameBoy *gb, int *dest, Grid *src) {
     bool window_visible = lcdc & 0x20 && window_y < VIDEO_HEIGHT && window_x < VIDEO_WIDTH;
     
     if(window_visible) {
-        grid_hide_behind_menu_tiles(src, vram, lcdc & 0x40, window_x, window_y);
+        grid_process_background_tiles(grid, vram, lcdc & 0x40, window_x, window_y);
     } else if(gb->game & GSC) {
-        grid_hide_behind_menu_tiles(src, vram, lcdc & 0x8, 0, 0);
+        grid_process_background_tiles(grid, vram, lcdc & 0x8, 0, 0);
     }
     
+}
+
+void grid_blittovideo(GameBoy *gb, int *dest, Grid *src) {
     int *dest_row = dest;
     int *src_row = src->pixels + src->viewport_x + src->viewport_y * src->width;
     int pixel_buffer[4];
@@ -370,8 +364,8 @@ void grid_blittovideo(GameBoy *gb, int *dest, Grid *src) {
                 }
             }
             
-            dest_ptr+=4;
-            src_ptr+=4;
+            dest_ptr += 4;
+            src_ptr += 4;
         }
         
         dest_row += VIDEO_WIDTH;

@@ -10,7 +10,7 @@ bool red_triple_extended(GameBoy *gb, int path) {
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 11);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wEnemyMonSpecies"), 3);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wEnemyMonLevel"), 4);
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wEnemyMonDVs"), 0xffef);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wEnemyMonDVs"), 0xffef);
     
     ASSERT_EQUALS(gameboy_yoloball(gb), true);
     

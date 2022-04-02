@@ -8,7 +8,7 @@ struct GameData {
     int ycoord_address;
     int map_address;
     int rom_bank_address;
-    u8 grid_lines_shade;
+    u8 grid_line_shade;
     int max_speedup_flags;
 };
 
@@ -19,7 +19,7 @@ const GameData RED_DATA = {
     .ycoord_address = symbol_lookup_red("wYCoord"),
     .map_address = symbol_lookup_red("wCurMap"),
     .rom_bank_address = symbol_lookup_red("hLoadedROMBank"),
-    .grid_lines_shade = 0x00,
+    .grid_line_shade = 0x00,
     .max_speedup_flags = NO_VIDEO | NO_SOUND | NO_PPU_CALL,
 };
 
@@ -30,7 +30,7 @@ const GameData BLUE_DATA = {
     .ycoord_address = symbol_lookup_blue("wYCoord"),
     .map_address = symbol_lookup_blue("wCurMap"),
     .rom_bank_address = symbol_lookup_blue("hLoadedROMBank"),
-    .grid_lines_shade = 0x00,
+    .grid_line_shade = 0x00,
     .max_speedup_flags = NO_VIDEO | NO_SOUND | NO_PPU_CALL,
 };
 
@@ -41,7 +41,7 @@ const GameData YELLOW_DATA = {
     .ycoord_address = symbol_lookup_yellow("wYCoord"),
     .map_address = symbol_lookup_yellow("wCurMap"),
     .rom_bank_address = symbol_lookup_yellow("hLoadedROMBank"),
-    .grid_lines_shade = 0x18,
+    .grid_line_shade = 0x18,
     .max_speedup_flags = NO_VIDEO | NO_SOUND,
 };
 
@@ -52,7 +52,7 @@ const GameData GOLD_DATA = {
     .ycoord_address = symbol_lookup_gold("wYCoord"),
     .map_address = symbol_lookup_gold("wMapNumber"),
     .rom_bank_address = symbol_lookup_gold("hROMBank"),
-    .grid_lines_shade = 0x3a,
+    .grid_line_shade = 0x38,
     .max_speedup_flags = NO_VIDEO | NO_SOUND,
 };
 
@@ -63,7 +63,7 @@ const GameData SILVER_DATA = {
     .ycoord_address = symbol_lookup_silver("wYCoord"),
     .map_address = symbol_lookup_silver("wMapNumber"),
     .rom_bank_address = symbol_lookup_silver("hROMBank"),
-    .grid_lines_shade = 0x3a,
+    .grid_line_shade = 0x38,
     .max_speedup_flags = NO_VIDEO | NO_SOUND,
 };
 
@@ -74,7 +74,7 @@ const GameData CRYSTAL_DATA = {
     .ycoord_address = symbol_lookup_crystal("wYCoord"),
     .map_address = symbol_lookup_crystal("wMapNumber"),
     .rom_bank_address = symbol_lookup_crystal("hROMBank"),
-    .grid_lines_shade = 0x3a,
+    .grid_line_shade = 0x38,
     .max_speedup_flags = NO_VIDEO | NO_SOUND,
 };
 

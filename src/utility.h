@@ -17,6 +17,13 @@ int diff8(int old_value, int new_value) {
     return forwards <= 128 ? forwards : -backwards;
 }
 
+int argb_pack_4x8(u8 a, u8 r, u8 g, u8 b) {
+    return ((a << 24) |
+            (r << 16) |
+            (g <<  8) |
+            (b <<  0));
+}
+
 void endian_swap(u32 *value) {
     *value = ((*value << 24) | 
               ((*value & 0xff00) << 8) |

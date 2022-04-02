@@ -11,8 +11,8 @@ bool yellow_nido(GameBoy *gb, int path) {
     ASSERT_EQUALS(gameboy_cpuread(gb, "wEnemyMonSpecies"), 3);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wEnemyMonSpecies"), 3);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wEnemyMonLevel"), 6);
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wEnemyMonDVs"), 0xfaee);
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wEnemyMonDVs"), 0xfaee);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wEnemyMonDVs"), 0xfaee);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wEnemyMonDVs"), 0xfaee);
     ASSERT_EQUALS(gameboy_yoloball(gb), true);
     return true;
 }

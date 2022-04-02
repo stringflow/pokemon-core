@@ -128,6 +128,7 @@ int gameboy_runfor(GameBoy *gb, u64 samples) {
     if(vidframe_done && !gb->callbacks_disabled) {
         if(gb->show_grid && gb->grid.pixels) {
             grid_update_viewport(gb, &gb->grid);
+            grid_process_tiles(gb, &gb->grid);
             grid_blittovideo(gb, gb->video_buffer, &gb->grid);
         }
         
@@ -280,28 +281,6 @@ DLLEXPORT ExecutionResult gameboy_execute(GameBoy *gb, const char *logstring) {
     }
 }
 
-// Clears all text until control is resumed to the player. This may happen at YES/NO
-// dialogues, when overworld movement is resumed, etc. It will hold the specified button
-// while text is printing for adequate manip execution, or no button at all for instant
-// text execution.
-DLLEXPORT void gameboy_cleartext(GameBoy *gb, int held_button) {
-    if(gb->game & RBY) {
-        rby_cleartext(gb, held_button);
-    } else {
-        gsc_cleartext(gb, held_button);
-    }
-}
-
-
-// Picks up the item in front of the player.
-DLLEXPORT void gameboy_pickupitem(GameBoy *gb) {
-    if(gb->game & RBY) {
-        rby_pickupitem(gb);
-    } else {
-        gsc_pickupitem(gb);
-    }
-}
-
 // Executes a full intro string, where each action is seperated by an underscore.
 DLLEXPORT void gameboy_executeintro(GameBoy *gb, const char *intro) {
     StringIterator it = { intro };
@@ -327,6 +306,28 @@ DLLEXPORT ExecutionResult gameboy_executepath(GameBoy *gb, const char *path) {
         result = gameboy_execute(gb, it.current_element);
     }
     return result;
+}
+
+// Clears all text until control is resumed to the player. This may happen at YES/NO
+// dialogues, when overworld movement is resumed, etc. It will hold the specified button
+// while text is printing for adequate manip execution, or no button at all for instant
+// text execution.
+DLLEXPORT void gameboy_cleartext(GameBoy *gb, int held_button) {
+    if(gb->game & RBY) {
+        rby_cleartext(gb, held_button);
+    } else {
+        gsc_cleartext(gb, held_button);
+    }
+}
+
+
+// Picks up the item in front of the player.
+DLLEXPORT void gameboy_pickupitem(GameBoy *gb) {
+    if(gb->game & RBY) {
+        rby_pickupitem(gb);
+    } else {
+        gsc_pickupitem(gb);
+    }
 }
 
 // Throws the ball located at the top of the item bag. Returns whether or not the pokemon

@@ -98,12 +98,6 @@ Executes any manip log string (i.e. `nopal`, `hop2`, `title1(reset)`, `R`, `D+A`
 For overworld actions it returns an enum for when emulation stopped.  
 Possible values are: INTRO (0), OVERWORLD_LOOP (1), WILD_ENCOUNTER (2), COLLISION (3),  
 TEXTBOX (4). Please note that for gen 2 execution, DVs of the wild encounter will not be generated yet, so further emulation until `CalcMonStats` has to be done for those.
-### gameboy_cleartext
-`(GameBoy *gb, int held_button) -> void`  
-Clears all text until control is resumed to the player. This may happen at YES/NO dialogues, when overworld movement is resumed, etc. It will hold the specified button while text is printing for adequate manip execution, or no button at all for instant text execution.
-### gameboy_pickupitem
-`(GameBoy *gb) -> void`  
-Picks up the item in front of the player.
 ### gameboy_executeintro
 `(GameBoy *gb, const char *intro) -> void`  
 Executes a full intro string, where each action is seperated by an underscore.
@@ -111,6 +105,12 @@ Executes a full intro string, where each action is seperated by an underscore.
 `(GameBoy *gb, const char *path) -> ExecutionResult`  
 Executes a full movement string, where actions are optionally seperated by spaces.  
 May not complete the entire path if a disturbance occurrs (wild encounter, collision, etc). Returns the address of the final [gameboy_execute](#gameboy_execute) call.
+### gameboy_cleartext
+`(GameBoy *gb, int held_button) -> void`  
+Clears all text until control is resumed to the player. This may happen at YES/NO dialogues, when overworld movement is resumed, etc. It will hold the specified button while text is printing for adequate manip execution, or no button at all for instant text execution.
+### gameboy_pickupitem
+`(GameBoy *gb) -> void`  
+Picks up the item in front of the player.
 ### gameboy_yoloball
 `(GameBoy *gb) -> bool`  
 Throws the ball located at the top of the item bag. Returns whether or not the pokemon was captured.

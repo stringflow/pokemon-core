@@ -10,7 +10,7 @@ bool crystal_totodile(GameBoy *gb, int path) {
     gameboy_cpuwrite(gb, "wGameTimeFrames", 4);
     ASSERT_EQUALS(gameboy_executepath(gb, paths[path]),
                   OVERWORLD_LOOP);
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6149);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wMapGroup"), 6149);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 7);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 4);
     gameboy_press(gb, A);
@@ -20,7 +20,7 @@ bool crystal_totodile(GameBoy *gb, int path) {
     gameboy_cleartext(gb, B);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wPartyMon1Species"), 158);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wPartyMon1Level"), 5);
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wPartyMon1DVs"), dvs[path]);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wPartyMon1DVs"), dvs[path]);
     return true;
 }
 
@@ -40,11 +40,11 @@ bool crystal_r29(GameBoy *gb, int path) {
                   OVERWORLD_LOOP);
     
     if(path < 3) {
-        ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6657);
+        ASSERT_EQUALS(gameboy_cpuread16be(gb, "wMapGroup"), 6657);
         ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 17);
         ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 11);
     } else {
-        ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6657);
+        ASSERT_EQUALS(gameboy_cpuread16be(gb, "wMapGroup"), 6657);
         ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 5);
         ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 25);
     }
@@ -57,7 +57,7 @@ bool crystal_r30_5(GameBoy *gb, int path) {
     gameboy_executeintro(gb, gsc_intro(path));
     ASSERT_EQUALS(gameboy_executepath(gb,"UUUUUUUULULUUUUUUURRRRRRUUUUUUUUURRRRRRUUUUUULLLLLLLLLLLDDLLLA+LLLLLUA+LLLUA+LU"),
                   OVERWORLD_LOOP);
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 6658);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wMapGroup"), 6658);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 9);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 9);
     return true;
@@ -68,13 +68,13 @@ bool crystal_r32(GameBoy *gb, int path) {
     gameboy_executeintro(gb, gsc_intro(path));
     ASSERT_EQUALS(gameboy_executepath(gb,"DDDDDDDDDDLLDDDLLLLLLDDDLLDLLLDLDDLD"),
                   OVERWORLD_LOOP);
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 2561);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wMapGroup"), 2561);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 3);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 29);
     gameboy_pickupitem(gb);
     ASSERT_EQUALS(gameboy_executepath(gb,"DDDDDLDDDDDDDDLDDDDDDDA+DDDDDDDDDDRDDRRA+RDDDDDD"),
                   OVERWORLD_LOOP);
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 2561);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wMapGroup"), 2561);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), 5);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), 67);
     return true;
@@ -105,12 +105,12 @@ bool crystal_raikou(GameBoy *gb, int path) {
     ASSERT_EQUALS(gameboy_executepath(gb, paths[path]),
                   WILD_ENCOUNTER);
     gameboy_rununtil(gb, "CalcMonStats", NONE);
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wMapGroup"), 2564);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wMapGroup"), 2564);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wXCoord"), end_coordinates[path*2+0]);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wYCoord"), end_coordinates[path*2+1]);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wEnemyMonSpecies"), 243);
     ASSERT_EQUALS(gameboy_cpuread(gb, "wEnemyMonLevel"), 40);
-    ASSERT_EQUALS(gameboy_cpuread16besym(gb, "wEnemyMonDVs"), dvs[path]);
+    ASSERT_EQUALS(gameboy_cpuread16be(gb, "wEnemyMonDVs"), dvs[path]);
     return true;
 }
 
